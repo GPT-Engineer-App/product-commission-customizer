@@ -1,0 +1,51 @@
+<?php
+/*
+Plugin Name: Custom Affiliate Commissions
+Plugin URI: http://yourwebsite.com/
+Description: Allows affiliate marketers to set their own commission rates on products.
+Version: 1.0
+Author: Your Name
+Author URI: http://yourwebsite.com/
+*/
+
+// Hook for adding admin menus
+add_action('admin_menu', 'custom_affiliate_commissions_menu');
+
+// Action function for the above hook
+function custom_affiliate_commissions_menu() {
+    add_menu_page('Affiliate Commissions', 'Affiliate Commissions', 'manage_options', 'custom_affiliate_commissions', 'custom_affiliate_commissions_page');
+}
+
+// Function to display the plugin admin page
+function custom_affiliate_commissions_page() {
+    ?>
+    <div class="wrap">
+        <h2>Set Your Commission</h2>
+        <form method="post" action="options.php">
+            <?php settings_fields('custom_affiliate_commissions_options'); ?>
+            <?php do_settings_sections('custom_affiliate_commissions'); ?>
+            <table class="form-table">
+                <tr valign="top">
+                    <th scope="row">Commission Rate (%)</th>
+                    <td><input type="text" name="commission_rate" value="<?php echo get_option('commission_rate'); ?>" /></td>
+                </tr>
+            </table>
+            <?php submit_button(); ?>
+        </form>
+    </div>
+    <?php
+}
+
+// Register and define the settings
+add_action('admin_init', 'custom_affiliate_commissions_admin_init');
+function custom_affiliate_commissions_admin_init(){
+    register_setting('custom_affiliate_commissions_options', 'commission_rate');
+}
+
+// Hook to save the commission rate
+add_action('init', 'save_commission_rate');
+function save_commission_rate() {
+    if (isset($_POST['commission_rate'])) {
+        update_option('commission_rate', sanitize_text_field($_POST['commission_rate']));
+    }
+}
